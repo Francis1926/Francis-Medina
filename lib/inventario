@@ -1,0 +1,237 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDarkMode = false;
+
+  void toggleTheme() {
+    setState(() {
+      isDarkMode = !isDarkMode;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: InventoryDashboard(toggleTheme: toggleTheme),
+    );
+  }
+}
+
+class InventoryDashboard extends StatelessWidget {
+  final VoidCallback toggleTheme;
+
+  InventoryDashboard({required this.toggleTheme});
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double containerWidth = screenWidth > 600 ? 500 : screenWidth * 0.9;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Dashboard Inventario de Ventas'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: toggleTheme,
+          ),
+        ],
+      ),
+      body: Center(
+        child: Container(
+          width: containerWidth,
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            // Agregado para permitir desplazamiento
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildHeader(),
+                Divider(),
+                _buildInventoryStatus(),
+                Divider(),
+                _buildRecentOrders(),
+                Divider(),
+                _buildStatistics(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Inventario Disponible', style: TextStyle(fontSize: 18)),
+            Text('\$125,300',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Ventas del Mes', style: TextStyle(fontSize: 18)),
+            Text('\$58,700',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInventoryStatus() {
+    final inventoryItems = [
+      InventoryItem(product: 'Laptop HP', quantity: 20, price: 650),
+      InventoryItem(product: 'Mouse Logitech', quantity: 100, price: 25),
+      InventoryItem(product: 'Teclado Corsair', quantity: 50, price: 85),
+      InventoryItem(product: 'Monitor Dell', quantity: 30, price: 210),
+      InventoryItem(product: 'Impresora Canon', quantity: 15, price: 150),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Inventario Reciente', style: TextStyle(fontSize: 18)),
+        SizedBox(height: 8),
+        Column(
+          children:
+              inventoryItems.map((item) => _buildInventoryItem(item)).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInventoryItem(InventoryItem item) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: Colors.blueAccent,
+        child: Text(item.product[0]),
+      ),
+      title: Text(item.product),
+      subtitle: Text('Cantidad: ${item.quantity}'),
+      trailing: Text('\$${item.price}'),
+    );
+  }
+
+  Widget _buildRecentOrders() {
+    final orders = [
+      OrderItem(id: '4100', client: 'Empresa A', amount: 750),
+      OrderItem(id: '4101', client: 'Empresa B', amount: 1200),
+      OrderItem(id: '4102', client: 'Empresa C', amount: 450),
+      OrderItem(id: '4103', client: 'Empresa D', amount: 980),
+      OrderItem(id: '4104', client: 'Empresa E', amount: 1500),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Pedidos Recientes', style: TextStyle(fontSize: 18)),
+        SizedBox(height: 8),
+        Column(
+          children: orders.map((order) => _buildOrderItem(order)).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrderItem(OrderItem order) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: Colors.blueAccent,
+        child: Text(order.id),
+      ),
+      title: Text('Pedido #${order.id}'),
+      subtitle: Text(order.client),
+      trailing: Text('\$${order.amount}'),
+    );
+  }
+
+  Widget _buildStatistics() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Estadísticas', style: TextStyle(fontSize: 18)),
+        SizedBox(height: 8),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Ventas totales'),
+          trailing: Text('\$950,000'),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Promedio diario'),
+          trailing: Text('\$30,500'),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Productos vendidos'),
+          trailing: Text('850 unidades'),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Clientes nuevos'),
+          trailing: Text('45'),
+        ),
+      ],
+    );
+  }
+}
+
+class OrderItem {
+  final String id;
+  final String client;
+  final double amount;
+
+  OrderItem({
+    required this.id,
+    required this.client,
+    required this.amount,
+  });
+}
+
+class InventoryItem {
+  final String product;
+  final int quantity;
+  final double price;
+
+  InventoryItem({
+    required this.product,
+    required this.quantity,
+    required this.price,
+  });
+}
